@@ -1,0 +1,85 @@
+/*---------------------------------*/
+집합연산자
+합집합 UNION       (합치면서 중복제거)
+      UNION ALL   (전부 다 합치기 중복제거X)
+교집합 INTERSECT
+차집합 MINUS
+
+* 제약조건
+ 1. 컬럼 갯수 동일
+ 2. 컬럼 데이터타입 동일
+ 3. 컬럼명은 달라도 상관없음
+ 
+ 
+ --학생 101학과 학생 + 102학과 학생 정보 총합 조회
+ SELECT *
+ FROM STUDENT
+ WHERE DEPTNO1 IN (101, 102);
+ 
+ SELECT *
+ FROM STUDENT
+ WHERE DEPTNO1 = 101
+ UNION ALL
+ SELECT *
+ FROM STUDENT
+ WHERE DEPTNO1 = 102;
+ 
+ --학생들 데이터
+ -- 101번 학과 학생 + 102번 학과 학생 중 키 170 넘는 학생
+ SELECT *
+ FROM STUDENT
+ WHERE DEPTNO1 = 101
+ UNION ALL
+ SELECT *
+ FROM STUDENT
+ WHERE DEPTNO1 = 102 AND HEIGHT > 170;
+ 
+ SELECT *
+ FROM STUDENT
+ WHERE DEPTNO1 = 101 OR (DEPTNO1 = 102 AND HEIGHT > 170);
+ 
+ -- 101번 학과에 속한 학생들 + 101번 학과에 재직중인 교수들 한번에 조회
+ SELECT STUDNO 식별번호, NAME 이름, DEPTNO1 학과
+ FROM STUDENT
+ WHERE DEPTNO1 = 101
+ UNION ALL
+ SELECT PROFNO, NAME, DEPTNO
+ FROM PROFESSOR
+ WHERE DEPTNO = 101
+ ORDER BY 2; -- 2번째 컬럼을 기준 (NAME 이름)
+-- ORDER BY 이름;
+
+
+
+SELECT STUDNO 식별번호, NAME 이름, DEPTNO1 학과, TEL 연락처
+ FROM STUDENT
+ WHERE DEPTNO1 = 101
+ UNION ALL
+ SELECT PROFNO, NAME, DEPTNO, NULL
+ FROM PROFESSOR
+ WHERE DEPTNO = 101
+ ORDER BY 2; -- 2번째 컬럼을 기준 (NAME 이름)
+-- ORDER BY 이름;
+
+-- 교집합
+SELECT *
+FROM STUDENT
+WHERE DEPTNO1 = 101
+INTERSECT
+SELECT *
+FROM STUDENT
+WHERE DEPTNO2 = 201;
+
+-- 차집합
+SELECT *
+FROM EMP
+WHERE JOB = 'SALESMAN' AND COMM > 0
+MINUS
+--차집합 이전 수상자
+SELECT *
+FROM EMP
+WHERE HIREDATE < '1982-01-01';
+
+select *
+from emp
+where (job = 'SALESMAN' and comm > 0) AND NOT (hiredate < '1982-01-01');
