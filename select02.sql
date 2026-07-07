@@ -1,0 +1,151 @@
+/*----------------------------------*/
+조건 WHERE 절
+필터링 기능, 원하는 조건에 따라서 조회
+
+SELECT ...
+FROM ...
+WHERE ... ;
+
+
+SELECT *
+FROM EMP;   --전체 데이터 조회
+
+SELECT *
+FROM EMP
+WHERE SAL > 2500;
+-- EMP 테이블에서 SAL 컬럼값이 2500을 초과하는 모든 데이터 조회
+
+SELECT ENAME
+FROM EMP
+WHERE SAL > 2500;
+-- EMP 테이블에서 SAL 컬럼값이 2500을 초과하는 직원들의 이름을 조회
+
+SELECT *
+FROM EMP
+WHERE JOB = 'SALESMAN';
+-- EMP 테이블에서 JOB(직업)이 SALESMAN인 직원들만 전체 컬럼 조회
+
+
+-- 부서번호가 10번인 사원들 정보 조회 (10번 부서에 속한)
+SELECT *
+FROM EMP
+WHERE DEPTNO = 10;
+
+-- 부서번호가 10번이 아닌 사원정보
+SELECT *
+FROM EMP
+--WHERE DEPTNO != 10;
+WHERE DEPTNO <> 10;
+
+SELECT *
+FROM STUDENT
+--WHERE WEIGHT >= 55; --55kg 이상
+--WHERE WEIGHT >= 55 AND WEIGHT <= 70; -- 55kg <= 대상 <= 70kg  -- AND OR
+WHERE WEIGHT BETWEEN 55 AND 70;
+
+SELECT *
+FROM STUDENT    -- 1~3 학년만 조회
+--WHERE GRADE >= 1 AND GRADE <= 3;
+--WHERE GRADE BETWEEN 1 AND 3;
+--WHERE GRADE = 1 OR GRADE = 2 OR GRADE = 3;
+--WHERE GRADE <> 4;
+--WHERE GRADE != 4;
+WHERE GRADE IN (1,2,3);
+
+-- NOT
+-- 2, 4 학년만 조회
+SELECT *
+FROM STUDENT
+--WHERE GRADE IN (2,4);
+--WHERE GRADE = 2 OR GRADE = 4;
+--WHERE GRADE != 1 AND GRADE <> 3;
+WHERE GRADE NOT IN (1,3);
+
+
+LIKE 패턴 검색 (문자)
+    % : 0~n개 아무갯수나 가능
+    _ : 해당 위치에 한개
+
+SELECT *
+FROM EMP
+--WHERE ENAME = 'SMITH';
+--WHERE ENAME LIKE '%M%'; -- 13122M12312  M123131  12234M
+--WHERE ENAME LIKE 'M%';
+--WHERE ENAME LIKE '%N';
+--WHERE ENAME LIKE '_M%'; -- OM   OM123131    SMITH
+WHERE ENAME LIKE '__M%';  -- JAMES
+-- NAME TITLE .. LIKE '%만두%'
+
+--NULL 값 비교
+SELECT *
+FROM EMP
+--WHERE COMM IS NULL;
+WHERE COMM IS NOT NULL;
+
+
+날짜비교
+1201
+1221
+미래일수록 큰 값
+과거일수록 작은 값
+
+SELECT *
+FROM EMP   --테이블 팝업설명 정보 -> Shift + F4
+--WHERE HIREDATE = '80/12/17'; -- YY/MM/DD
+--WHERE HIREDATE = '1980-12-17'; -- YYYY-MM-DD
+--WHERE HIREDATE > '80/08/20';
+WHERE HIREDATE <= '1981-04-05';
+
+DESC EMP;
+
+
+/*----------------------------------*/
+정렬 ORDER BY
+단순조회 -> 정렬을 명시하지 않으면 순서보장X
+ORDER BY 정렬기준컬럼명 [ASC | DESC] [오름차순 | 내림차순]
+
+SELECT ...
+FROM ...
+WHERE ...
+ORDER BY ...;
+
+SELECT ...
+FROM ...
+ORDER BY ...;
+
+SELECT *
+FROM STUDENT
+--ORDER BY NAME;  -- ASC 기본값 오름차순
+ORDER BY NAME ASC;
+
+--내림차순
+SELECT *
+FROM STUDENT
+ORDER BY NAME DESC;
+
+-- 학생들 학년기준으로 내림차순 정렬 -> 이름과 학년을 조회
+SELECT NAME, GRADE
+FROM STUDENT
+ORDER BY GRADE DESC;
+
+-- 학생테이블 기준 1,2,3 학년 학생들을 키 내림차순 순서로 조회
+SELECT NAME, GRADE, HEIGHT
+FROM STUDENT
+WHERE GRADE IN (1,2,3)
+ORDER BY HEIGHT DESC;
+
+SELECT NAME, GRADE, HEIGHT
+FROM STUDENT
+WHERE GRADE IN (1,2,3)
+--ORDER BY GRADE, HEIGHT DESC;
+ORDER BY GRADE DESC, HEIGHT ASC;
+
+SELECT NAME, GRADE, HEIGHT
+FROM STUDENT
+WHERE GRADE IN (1,2,3)
+ORDER BY HEIGHT, GRADE DESC;
+
+SELECT *
+FROM student
+--ORDER BY BIRTHDAY;  --오름차순  작은값->큰값   작을수록 더 과거  클수록 더 미래
+ORDER BY BIRTHDAY desc;
