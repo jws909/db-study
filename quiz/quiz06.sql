@@ -1,0 +1,38 @@
+--1.
+SELECT
+    ENAME,
+    SUBSTR(ENAME, 1, 2) || '--' || SUBSTR(ENAME, 5) AS "REPLACE"
+FROM EMP
+WHERE DEPTNO = 20;
+
+--2.
+SELECT
+    NAME,
+    SUBSTR(JUMIN, 1, 6) || '-/-/-/-' AS "주민뒷자리숨김"
+FROM STUDENT
+WHERE DEPTNO1 = 101;
+
+--3.
+SELECT
+    NAME,
+    TEL,
+    SUBSTR(TEL, 1, 4) || '***' || SUBSTR(TEL, 8, 5) AS "REPLACE"
+FROM STUDENT
+WHERE DEPTNO1 = 102;
+
+--3. OPTION 응용) 가운데 자리 숫자의 자리수에 맞춰서 *로 바꾸기
+SELECT
+    NAME,
+    TEL,
+    SUBSTR(TEL, 1, INSTR(TEL, ')')) 
+    || LPAD(SUBSTR(TEL, 8, 5), INSTR(TEL, '-')-INSTR(TEL, ')')+4, '*') AS "REPLACE"
+FROM STUDENT
+WHERE DEPTNO1 = 101;
+
+--4.
+SELECT
+    NAME,
+    TEL,
+    SUBSTR(TEL, 1, INSTR(TEL, '-')) || '****' AS "REPLACE"
+FROM STUDENT
+WHERE DEPTNO1 = 101;
