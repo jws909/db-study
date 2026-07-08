@@ -1,0 +1,34 @@
+--1.
+SELECT 
+    NAME AS "이름", 
+    SUBSTR(JUMIN, 1, 2) "년도",
+    SUBSTR(JUMIN, 3, 2) 월,
+    SUBSTR(JUMIN, 5, 2) 일
+--    SUBSTR(BIRTHDAY, 1, 2) AS "년도",
+--    SUBSTR(BIRTHDAY, INSTR(BIRTHDAY, '/', 1, 1)+1, 2) AS "월",
+--    SUBSTR(BIRTHDAY, INSTR(BIRTHDAY, '/', 1, 2)+1, 2) AS "일"
+FROM STUDENT;
+
+--2.
+SELECT
+    NAME,
+    TEL,
+    INSTR(TEL, ')', 1) AS "괄호위치"
+FROM STUDENT
+WHERE DEPTNO1 = 201;
+
+--3.
+SELECT
+    NAME,
+    TEL,
+    INSTR(TEL, 3, 1) AS "첫3위치"
+FROM STUDENT
+WHERE DEPTNO1 = 101;
+
+--4.
+SELECT
+    NAME,
+    TEL,
+    SUBSTR(TEL, 1, INSTR(TEL, ')')-1) AS "지역번호"
+FROM STUDENT
+WHERE DEPTNO1 = 201;
