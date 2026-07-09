@@ -1,0 +1,36 @@
+--emp 전체 sal 급여 평균
+SELECT AVG(SAL)
+FROM EMP;
+
+--emp 30번부서사람들 평균급여
+SELECT AVG(SAL)
+FROM EMP
+WHERE DEPTNO = 30;
+
+--emp 각부서별 평균 급여
+SELECT DEPTNO, ROUND(AVG(SAL),2), TRUNC(AVG(SAL))
+FROM EMP
+GROUP BY DEPTNO
+ORDER BY DEPTNO;
+
+--emp 각부서별 인원과 평균 급여
+SELECT DEPTNO, COUNT(*), AVG(SAL)
+FROM EMP
+GROUP BY DEPTNO
+ORDER BY DEPTNO;
+
+--emp 각 직업별 평균 급여
+SELECT JOB, AVG(SAL)
+FROM EMP
+GROUP BY JOB;
+
+--emp 각 직업별 가장 높은 급여 얼마?
+SELECT JOB, MAX(SAL)
+FROM EMP
+GROUP BY JOB;
+
+--emp 각 부서별 가장 높은 급여 얼마?
+SELECT DEPTNO, MAX(SAL)
+FROM EMP
+GROUP BY DEPTNO
+ORDER BY DEPTNO;
