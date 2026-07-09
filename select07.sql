@@ -1,0 +1,184 @@
+/*------------------------------------*/
+복수행함수   (집계)
+
+COUNT(대상)  갯수세기
+
+SELECT *
+FROM EMP;
+
+SELECT COUNT(*)
+FROM EMP;
+
+-- 갯수 대상식별자 ( *, 기본키 Primary Key / PK - 유니크(중복 X), 값존재(NULL X))
+
+SELECT
+    COUNT(EMPNO),
+    COUNT(ENAME),
+    COUNT(MGR),
+    COUNT(COMM) -- NULL이 아닌 값의 갯수
+FROM EMP;
+
+-- NULL값 제외 값을 셀때 권장되는 방법
+SELECT
+    COUNT(*)
+FROM EMP
+WHERE COMM IS NOT NULL;
+
+SELECT
+    COUNT(*)
+FROM EMP
+WHERE COMM IS NULL;
+
+--STUDENT 4학년 몇명?
+SELECT COUNT(*)
+FROM STUDENT
+WHERE GRADE = 4;
+
+
+
+수치집계
+SUM / AVG / MAX / MIN / STDDEV / VARIANCE
+
+-- 총 직원 몇명, 총급여 얼마냐
+SELECT
+    COUNT(*), SUM(SAL), SUM(COMM)
+FROM EMP;
+
+-- 10, 20 부서에 다니는 직원 몇명, 총급여
+SELECT
+    COUNT(*), SUM(SAL)
+FROM EMP
+WHERE DEPTNO IN (10, 20);
+
+SELECT
+    COUNT(HEIGHT),
+    SUM(HEIGHT),
+    AVG(HEIGHT),
+    MAX(HEIGHT),
+    MIN(HEIGHT),
+    STDDEV(HEIGHT),
+    VARIANCE(HEIGHT),
+    AVG(WEIGHT)
+FROM STUDENT;
+
+
+/*------------------------------------*/
+그룹화하기 GROUP BY
+
+SELECT ...
+FROM ...
+WHERE ...
+GROUP BY 컬럼대상을 지정(지정된 컬럼을 기준으로 그룹지어서 계산)
+         GROUP BY 에 명시한 컬럼은 SELECT 조회에 사용 가능
+HAVING
+ORDER BY
+;
+--학생들 각 학년별 평균키
+
+SELECT '1학년' 학년, AVG(HEIGHT) 키평균
+FROM STUDENT
+WHERE GRADE = 1
+UNION ALL
+SELECT '2학년', AVG(HEIGHT)
+FROM STUDENT
+WHERE GRADE = 2
+UNION ALL
+SELECT '3학년', AVG(HEIGHT)
+FROM STUDENT
+WHERE GRADE = 3
+UNION ALL
+SELECT '4학년', AVG(HEIGHT)
+FROM STUDENT
+WHERE GRADE = 4;
+
+
+SELECT
+    GRADE 학년,
+    AVG(HEIGHT) 평균키
+FROM STUDENT
+GROUP BY GRADE;
+
+SELECT
+    GRADE 학년,
+    COUNT(*),
+    AVG(HEIGHT) 평균키
+FROM STUDENT
+GROUP BY GRADE
+ORDER BY GRADE;
+
+SELECT
+    STUDNO,
+    COUNT(*),
+    AVG(HEIGHT) 평균키
+FROM STUDENT
+GROUP BY STUDNO;
+
+-- 1,2,3 학년별 평균키 학년기준 내림차순 정렬
+SELECT
+    GRADE 학년,
+    AVG(HEIGHT) 평균키
+FROM STUDENT
+WHERE GRADE IN (1,2,3)
+GROUP BY GRADE
+ORDER BY 학년 DESC;
+
+
+1) 급여가 2000 이상인 직원들 대상으로 부서별 평균급여
+SELECT
+    DEPTNO,
+    AVG(SAL)
+FROM EMP
+WHERE SAL >= 2000
+GROUP BY DEPTNO
+ORDER BY DEPTNO;
+
+2) 부서별 평균급여가 2000 이상인 부서별 평균급여
+SELECT
+    DEPTNO,
+    AVG(SAL)
+FROM EMP
+GROUP BY DEPTNO
+HAVING AVG(SAL) >= 2000;
+
+
+STUDENT
+학생 각 학년별 평균 몸무게
+평균 몸무게가 65Kg 이상 경우만
+SELECT 
+    GRADE, AVG(WEIGHT)
+FROM STUDENT
+GROUP BY GRADE
+HAVING AVG(WEIGHT) >= 65;
+
+
+STUDENT
+4학년을 제외하고
+학생 각 학년별 평균 몸무게
+평균 몸무게가 65Kg 이상 경우만
+학년별 오름차순 정렬
+SELECT
+    GRADE,
+    AVG(WEIGHT)
+FROM STUDENT
+WHERE GRADE <> 4
+GROUP BY GRADE
+HAVING AVG(WEIGHT) >= 65
+ORDER BY GRADE;
+
+
+-- ORDER BY GRADE, HEIGHT
+SELECT *
+FROM EMP;
+
+SELECT DEPTNO, AVG(SAL)
+FROM EMP
+GROUP BY DEPTNO;
+
+SELECT JOB, AVG(SAL)
+FROM EMP
+GROUP BY JOB;
+
+SELECT DEPTNO, JOB, AVG(SAL)
+FROM EMP
+GROUP BY DEPTNO, JOB
+ORDER BY AVG(SAL) DESC;
