@@ -1,0 +1,103 @@
+/**------------------------------**/
+서브쿼리...
+
+ROWNUM 활용
+
+SELECT ROWNUM, RN, STUDNO, NAME, HEIGHT
+FROM(
+        SELECT
+            ROWNUM RN,
+            CEIL(ROWNUM/3),
+            STUDNO,
+            NAME,
+            HEIGHT
+        FROM STUDENT
+        ORDER BY HEIGHT);
+        
+
+SELECT *
+FROM STUDENT
+WHERE ROWNUM <= 5;  --그냥 조회 결과 5명
+
+--키큰 사람 5명 조회
+SELECT *
+FROM STUDENT
+WHERE ROWNUM <= 5       --기존배정된 ROWNUM으로 인식 -> 정렬 이후 ROWNUM과 다름
+ORDER BY HEIGHT DESC;
+
+SELECT ROWNUM, STUDNO, NAME, HEIGHT
+FROM (SELECT *
+      FROM STUDENT
+      ORDER BY HEIGHT DESC)
+WHERE ROWNUM <= 5;
+
+
+
+--팀 번호로 팀 조회
+SELECT
+    ROWNUM,
+    CEIL(ROWNUM/3),
+    STUDNO,
+    NAME
+FROM STUDENT
+WHERE CEIL(ROWNUM/3) = 3;   --인식 제대로 안됨
+
+SELECT *
+FROM(SELECT
+        ROWNUM RN,
+        CEIL(ROWNUM/3) TEAM,
+        STUDNO,
+        NAME
+     FROM STUDENT)
+WHERE TEAM = 3;
+
+
+/*------------------------------------*/
+GROUP BY 집계 -> SUBQUERY,    JOIN
+
+부서별 최대급여
+SELECT DEPTNO, MAX(SAL), ENAME --집계 결과 + 일반 컬럼 값 동시에 표현하기 힘듬
+FROM EMP
+GROUP BY DEPTNO, ENAME;    -- 집계기준으로 활용여부 -> 목적에 맞는 그룹화가 아님
+
+
+SELECT DEPTNO, MAX(SAL)
+FROM EMP
+GROUP BY DEPTNO;
+
+
+SELECT *
+FROM EMP A, (SELECT DEPTNO, MAX(SAL) MAX_SAL
+             FROM EMP
+             GROUP BY DEPTNO) B
+WHERE A.DEPTNO = B.DEPTNO;
+
+--부서별 최대 급여 + 부서명
+SELECT DEPTNO, MAX(SAL)
+FROM EMP
+GROUP BY DEPTNO;
+
+SELECT E.DEPTNO, D.DNAME, E.MAX_SAL
+FROM DEPT D, (SELECT DEPTNO, MAX(SAL) MAX_SAL
+             FROM EMP
+             GROUP BY DEPTNO) E
+WHERE D.DEPTNO = E.DEPTNO;
+
+
+SELECT DEPTNO, MAX(SAL), (SELECT DNAME FROM DEPT WHERE DEPTNO = E.DEPTNO)
+FROM EMP E
+GROUP BY DEPTNO;
+
+SELECT DEPTNO, MAX_SAL, (SELECT DNAME FROM DEPT WHERE DEPTNO = E.DEPTNO)
+FROM (
+        SELECT DEPTNO, MAX(SAL) MAX_SAL
+        FROM EMP
+        GROUP BY DEPTNO) E;
+        
+SELECT DEPTNO, DNAME, MAX(SAL)
+FROM (
+    SELECT E.DEPTNO, E.SAL, D.DNAME
+    FROM EMP E, DEPT D
+    WHERE E.DEPTNO = D.DEPTNO
+)
+GROUP BY DEPTNO, DNAME;
