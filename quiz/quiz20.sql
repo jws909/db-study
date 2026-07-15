@@ -1,0 +1,31 @@
+-- 1. professor 테이블과 department 테이블을 조회하여 
+-- 각 학과별로 입사일이 가장 오래된 교수의 교수번호와 이름, 학과명을 출력하세요
+-- (입사일 순으로 오름차순 정렬)
+SELECT P.PROFNO, P.NAME, D.DNAME
+FROM PROFESSOR P, DEPARTMENT D, (SELECT DEPTNO, MIN(HIREDATE) MIN_HIRE
+                                 FROM PROFESSOR
+                                 GROUP BY DEPTNO) M
+WHERE P.DEPTNO = D.DEPTNO
+AND P.HIREDATE = M.MIN_HIRE
+AND P.DEPTNO = M.DEPTNO
+ORDER BY P.HIREDATE;
+
+SELECT PROFNO, NAME, DNAME
+FROM (SELECT P.PROFNO, P.NAME, D.DNAME, P.HIREDATE,
+        RANK() OVER (PARTITION BY P.DEPTNO ORDER BY P.HIREDATE) RANK
+      FROM PROFESSOR P, DEPARTMENT D
+      WHERE P.DEPTNO = D.DEPTNO)
+WHERE RANK = 1
+ORDER BY HIREDATE, PROFNO;
+
+-- 2. emp2 테이블 조회하여 
+-- 직급별로 해당 직급에서 최대 연봉을 받는 직원의 이름과 직급, 연봉을 출력하세요
+-- (연봉순으로 오름차순 정렬)
+SELECT * FROM EMP2;
+SELECT E.NAME, E.POSITION, E.PAY
+FROM EMP2 E, (SELECT POSITION, MAX(PAY) MAX_PAY
+              FROM EMP2
+              GROUP BY POSITION) MP
+WHERE E.POSITION = MP.POSITION
+AND E.PAY = MP.MAX_PAY
+ORDER BY E.PAY;
