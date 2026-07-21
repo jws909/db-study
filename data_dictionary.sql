@@ -1,0 +1,27 @@
+데이터 딕셔너리 (사전)
+오라클 DB에 관련된 각종 정보를 확인할 수 있는 사전(테이블)
+
+접근 자료 구분
+USER_   : 현재 로그인 사용자가 소유한 객체 정보
+ALL_    : 현재 로그인 사용자가 볼 수 있는 모든 객체 정보
+DBA_    : DB 관리자 계정에서 조회 객체 정보
+
+SELECT * FROM USER_TABLES;
+SELECT * FROM ALL_TABLES;
+SELECT * FROM DBA_TABLES;
+
+SELECT * FROM USER_VIEWS;
+SELECT * FROM USER_SEQUENCES;
+SELECT * FROM USER_OBJECTS;
+SELECT * FROM USER_CONSTRAINTS;
+SELECT * FROM USER_CONS_COLUMNS;
+SELECT * FROM USER_INDEXES;
+SELECT * FROM USER_IND_COLUMNS;
+
+SELECT * FROM ALL_USERS;
+SELECT * FROM USER_ROLE_PRIVS;
+
+--테이블 이름으로 조회시
+SELECT *
+FROM TAB
+WHERE TNAME LIKE '%EMP%';
