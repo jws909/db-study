@@ -1,0 +1,183 @@
+/****************************************/
+시퀀스 (Sequence)
+
+순차적으로 값을 사용하는 용도 (번호표)
+                (다른 DB AUTO INCREMENT ...)
+                
+PK(기본키) 용으로 사용하거나 순차적인 데이터를 표현하기위해 사용하는 숫자 값
+시퀀스를 호출 할 때마다 자동으로 증가
+
+
+시퀀스 생성
+
+CREATE SEQUENCE 시퀀스명
+INCREMENT BY 1  --증가할 값
+START WITH 1    --시작값
+MINVALUE 1      --최소값
+MAXVALUE 10     --최대값
+CYCLE | NOCYCLE --순환여부  DEFAULT: NOCYCLE
+CACHE 20 | NOCACHE --숫자 메모리에 미리 저장해둘 갯수
+;
+
+시퀀스 삭제
+DROP SEQUENCE 시퀀스명
+
+시퀀스 사용(호출)
+시퀀스명.NEXTVAL 다음값 호출(사용)
+시퀀스명.CURRVAL 현재값 확인
+;
+/********************************/
+
+--PK 설정 / PK 활용
+
+CREATE TABLE SEQ_TEST
+(
+    NO NUMBER(6) PRIMARY KEY,
+    NAME VARCHAR2(32)
+);
+
+SELECT * FROM SEQ_TEST;
+
+수동으로 NO(PK) 값 확인하고 처리
+INSERT INTO SEQ_TEST VALUES (1, '이름1');
+INSERT INTO SEQ_TEST VALUES (2, '이름2');
+
+SELECT * FROM SEQ_TEST;
+
+서브쿼리로 NO 순번 값 계산으로 처리 (COUNT)
+SELECT COUNT(*) FROM SEQ_TEST;  --현재 갯수
+SELECT COUNT(*)+1 FROM SEQ_TEST;  --다음 NO값
+
+INSERT INTO SEQ_TEST VALUES ((SELECT COUNT(*)+1 FROM SEQ_TEST), '이름3');
+INSERT INTO SEQ_TEST VALUES ((SELECT COUNT(*)+1 FROM SEQ_TEST), '이름4');
+INSERT INTO SEQ_TEST VALUES ((SELECT COUNT(*)+1 FROM SEQ_TEST), '이름5');
+
+SELECT * FROM SEQ_TEST;
+
+--한명이 탈퇴 3번 사용자 탈퇴
+SELECT *
+--DELETE
+FROM SEQ_TEST
+WHERE NO = 3;
+
+다음 사용자 가입 저장 -> PK 중복으로 저장 불가 케이스
+INSERT INTO SEQ_TEST VALUES ((SELECT COUNT(*)+1 FROM SEQ_TEST), '이름6');
+
+---------*******
+데이터 관리 기준이 어떻게 되느냐?
+삭제(탈퇴) 어떻게 관리? 탈퇴하면?
+    1) 데이터 행 삭제 (DELETE FROM ...)
+    2) 삭제된 것처럼 데이터(상태값)로 관리 ('Y', 'N', ... 'O', 'X')
+---------*******
+
+SELECT * 
+-- DELETE
+FROM SEQ_TEST;
+
+서브쿼리로 NO 순번 값 계산으로 처리 (MAX)
+
+SELECT MAX(NO)  --현재 마지막으로 사용된 제일 큰 NO값
+FROM SEQ_TEST;
+
+SELECT MAX(NO)+1 --이 다음에 사용할 NO 값
+FROM SEQ_TEST;
+
+SELECT NVL(MAX(NO), 0)+1 --이 다음에 사용할 NO 값
+FROM SEQ_TEST;
+SELECT NVL(MAX(NO)+1, 1) --이 다음에 사용할 NO 값
+FROM SEQ_TEST;
+
+INSERT INTO SEQ_TEST VALUES ((SELECT NVL(MAX(NO), 0)+1 FROM SEQ_TEST), '이름6');
+
+
+
+시퀀스 로 NO 순번값 처리
+
+CREATE SEQUENCE SEQ_SEQ_TEST_PK
+INCREMENT BY 1
+START WITH 1;
+--MIN/MAX/CACHE/NOCYCLE
+
+SELECT SEQ_SEQ_TEST_PK.NEXTVAL FROM DUAL; --다음 차례 SEQ 호출 (호출하는 순간 사용됨, 계속 진행)
+SELECT SEQ_SEQ_TEST_PK.CURRVAL FROM DUAL; --현재 시퀀스값 확인
+
+
+INSERT INTO SEQ_TEST VALUES (SEQ_SEQ_TEST_PK.NEXTVAL, '이름7');
+INSERT INTO SEQ_TEST VALUES (SEQ_SEQ_TEST_PK.NEXTVAL, '이름8');
+INSERT INTO SEQ_TEST VALUES (SEQ_SEQ_TEST_PK.NEXTVAL, '이름9');
+
+SELECT * FROM SEQ_TEST ORDER BY NO;
+
+SELECT * 
+-- DELETE
+FROM SEQ_TEST
+WHERE NO = 11;
+
+INSERT INTO SEQ_TEST VALUES (SEQ_SEQ_TEST_PK.NEXTVAL, '이름10');
+INSERT INTO SEQ_TEST VALUES (SEQ_SEQ_TEST_PK.NEXTVAL, '이름11');
+
+PK를 시퀀스로 사용
+일반 숫자로 활용 ~9999999999999999999999999999
+코드와 결합 'CL' || SEQ.NEXTVAL  CL1 CL2 CL3 CL4
+          'SH' || SEQ.NEXTVAL  SH1 SH5 SH6 SH7
+          
+시퀀스 값을 조정해서 다시 1부터 시작
+
+1) 시퀀스 삭제 후 재생성
+DROP SEQUENCE SEQ_SEQ_TEST_PK;
+
+CREATE SEQUENCE SEQ_SEQ_TEST_PK
+INCREMENT BY 1
+START WITH 1;
+
+SELECT SEQ_SEQ_TEST_PK.NEXTVAL FROM DUAL;
+
+
+2) 다음 시퀀스 값 조정
+
+--현재값 확인
+SELECT SEQ_SEQ_TEST_PK.CURRVAL FROM DUAL;
+--이 다음에 다시 NEXTVAL을 호출했을때 1이 나오도록 만들기!
+
+--0으로 바꾸기 , 그 다음에 +1    -> 1
+--지금 26 기준
+
+--값이 조정되는 기준을 변경
+ALTER SEQUENCE SEQ_SEQ_TEST_PK INCREMENT BY -26;
+ALTER SEQUENCE SEQ_SEQ_TEST_PK MINVALUE 0;
+--1회 호출해서 다음값 변경 (0으로 만들기)
+SELECT SEQ_SEQ_TEST_PK.NEXTVAL FROM DUAL;
+--다시 1씩 증가하는 기준으로 설정 복구
+ALTER SEQUENCE SEQ_SEQ_TEST_PK INCREMENT BY 1;
+--시퀀스 다시 사용
+SELECT SEQ_SEQ_TEST_PK.NEXTVAL FROM DUAL;
+
+----------------------------------------------
+
+CREATE SEQUENCE SEQ1
+START WITH 1
+INCREMENT BY 1
+MINVALUE 1
+MAXVALUE 5
+NOCYCLE;
+
+SELECT SEQ1.NEXTVAL FROM DUAL;
+
+
+CREATE SEQUENCE SEQ2
+START WITH 1
+INCREMENT BY 1
+MINVALUE 1
+MAXVALUE 5
+CYCLE
+CACHE 3;
+
+SELECT SEQ2.NEXTVAL FROM DUAL;
+
+
+
+CREATE SEQUENCE SEQ3
+START WITH 100
+INCREMENT BY 5;
+
+SELECT SEQ3.NEXTVAL FROM DUAL;
